@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Plano de Treino — Tamile Acosta</title>
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --muted:#93a6b2; --txt:#e6eef3;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,#071427 0%, #071927 100%);
+    color:var(--txt); -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale; padding:18px;
+  }
+
+  .app {
+    max-width:920px; margin:0 auto;
+    display:grid; gap:16px;
+  }
+
+  header {
+    display:flex; gap:12px; align-items:center; justify-content:space-between;
+  }
+  .title {
+    display:flex; gap:12px; align-items:center;
+  }
+  .logo {
+    width:56px; height:56px; border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#7c3aed);
+    display:flex; align-items:center; justify-content:center; font-weight:700;
+    color:#022; font-size:13px;
+  }
+  h1{margin:0;font-size:18px;letter-spacing:0.2px}
+  p.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+  /* tabs / filters */
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .tab {
+    background:transparent; border:1px solid rgba(255,255,255,0.06);
+    padding:8px 12px; border-radius:12px; cursor:pointer; color:var(--muted);
+    font-weight:600; font-size:13px;
+  }
+  .tab.active {
+    background:linear-gradient(90deg, rgba(6,182,212,0.12), rgba(124,58,237,0.06));
+    color:var(--txt); border-color:rgba(6,182,212,0.18);
+    box-shadow:0 6px 18px rgba(0,0,0,0.5);
+  }
+
+  main{ display:grid; gap:12px; grid-template-columns: 1fr 320px; align-items:start; }
+  @media (max-width:920px){ main{grid-template-columns:1fr} }
+
+  .card {
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:var(--radius); padding:14px; box-shadow: 0 6px 24px rgba(2,6,23,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .day-title{ font-size:16px; margin:0 0 8px 0; display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .progress {
+    height:10px; background:rgba(255,255,255,0.04); border-radius:999px; overflow:hidden;
+    width:220px;
+  }
+  .progress > i { display:block; height:100%; width:0%; background: linear-gradient(90deg,var(--accent),#7c3aed); transition:width 300ms ease; }
+
+  .ex-list{ display:grid; gap:8px; margin-top:8px; }
+  .ex {
+    display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border:1px solid rgba(255,255,255,0.02);
+  }
+  .ex .left{flex:1}
+  .ex h3{margin:0;font-size:14px}
+  .meta{font-size:12px;color:var(--muted); margin-top:4px}
+  .chk {
+    width:46px; height:46px; min-width:46px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(255,255,255,0.04); cursor:pointer; background:transparent;
+  }
+  .chk input{display:none}
+  .chk.checked{ background:linear-gradient(90deg,var(--accent),#7c3aed); border-color:rgba(255,255,255,0.06); color:#012; font-weight:700; }
+
+  /* right column */
+  .side { display:flex; flex-direction:column; gap:12px; }
+  .small {font-size:13px; color:var(--muted)}
+  .btn {
+    display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:none;
+    cursor:pointer; font-weight:700; font-size:13px; color:var(--txt); background:var(--accent);
+  }
+  .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.05); color:var(--muted); font-weight:600 }
+  footer { text-align:center; color:var(--muted); font-size:12px; margin-top:6px; }
+
+  /* utilities */
+  .row{display:flex;gap:8px;align-items:center}
+  .muted{color:var(--muted)}
+  .controls{display:flex; gap:8px; flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="logo">TA</div>
+        <div>
+          <h1>Plano de Treino — Tamile Acosta</h1>
+          <p class="subtitle">Selecione o dia e marque os aparelhos/exercícios realizados</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small muted">Status salvo localmente</div>
+      </div>
+    </header>
+
+    <div class="tabs card" id="tabs">
+      <button class="tab active" data-day="Segunda">Segunda</button>
+      <button class="tab" data-day="Terça">Terça</button>
+      <button class="tab" data-day="Quarta">Quarta</button>
+      <button class="tab" data-day="Quinta">Quinta</button>
+      <button class="tab" data-day="Sexta">Sexta</button>
+      <div style="flex:1"></div>
+      <div class="controls">
+        <button class="btn ghost" id="markAll">Marcar Tudo</button>
+        <button class="btn ghost" id="clearDay">Limpar Dia</button>
+        <button class="btn" id="exportCsv">Exportar CSV</button>
+      </div>
+    </div>
+
+    <main>
+      <section class="card" id="content">
+        <div class="day-title">
+          <div>
+            <strong id="currentDay">Segunda</strong>
+            <div class="muted" id="daySubtitle">Glúteos — 0/0</div>
+          </div>
+          <div class="progress" title="Progresso do dia"><i id="progressBar"></i></div>
+        </div>
+
+        <div class="ex-list" id="exList">
+          <!-- exercícios serão renderizados aqui -->
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="small muted">Resumo Semanal</div>
+              <div style="font-weight:800;font-size:18px" id="weekPct">0% completo</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small muted">Dias</div>
+              <div id="daysDone" style="font-weight:800">0/5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="small muted">Ações rápidas</div>
+          <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btn ghost" id="todayBtn">Ir para Hoje</button>
+            <button class="btn ghost" id="resetAll">Resetar Tudo</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="small muted">Export & Import</div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <input id="importFile" type="file" accept=".json" style="display:none"/>
+            <button class="btn ghost" id="importBtn">Importar JSON</button>
+            <button class="btn ghost" id="downloadJson">Baixar JSON</button>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer class="muted">Plano gerado a partir da imagem do treino. Persistência local via browser.</footer>
+  </div>
+
+<script>
+/* Plano de exercícios extraído da imagem */
+const PLAN = {
+  "Segunda": {
+    subtitle: "Glúteos",
+    exercises: [
+      {id:"s1", name:"Agachamento sumo", series:4, reps:"15", work:"Glúteo"},
+      {id:"s2", name:"Elevação Pélvica", series:4, reps:"20", work:"Glúteo"},
+      {id:"s3", name:"Afundo com Haltere", series:3, reps:"12", work:"Glúteo"},
+      {id:"s4", name:"Cadeira Abdutora", series:3, reps:"15", work:"Glúteo"},
+      {id:"s5", name:"Glúteo Máquina", series:3, reps:"15", work:"Glúteo"},
+      {id:"s6", name:"Agachamento Livre", series:3, reps:"15", work:"Quadríceps"},
+    ]
+  },
+  "Terça": {
+    subtitle: "Ombro, Peito & Tríceps",
+    exercises: [
+      {id:"t1", name:"Supino Reto", series:4, reps:"12", work:"Peito"},
+      {id:"t2", name:"Desenvolvimento com Halteres", series:3, reps:"12", work:"Ombro"},
+      {id:"t3", name:"Elevação Lateral", series:3, reps:"15", work:"Ombro"},
+      {id:"t4", name:"Tríceps Pulley", series:3, reps:"15", work:"Tríceps"},
+      {id:"t5", name:"Tríceps Testa", series:3, reps:"12", work:"Tríceps"},
+      {id:"t6", name:"Peck Deck", series:3, reps:"15", work:"Peito"},
+    ]
+  },
+  "Quarta": {
+    subtitle: "Pernas (Foco em quadríceps)",
+    exercises: [
+      {id:"q1", name:"Leg. 45", series:4, reps:"15", work:"Quadríceps"},
+      {id:"q2", name:"Agachamento Hack", series:3, reps:"12", work:"Quadríceps"},
+      {id:"q3", name:"Extensora", series:3, reps:"15", work:"Quadríceps"},
+      {id:"q4", name:"Agachamento Búlgaro", series:3, reps:"12", work:"Quadríceps"},
+      {id:"q5", name:"Avanço com Halteres", series:3, reps:"12", work:"Quadríceps"},
+      {id:"q6", name:"Cadeira Flexora", series:3, reps:"15", work:"Posterior"},
+    ]
+  },
+  "Quinta": {
+    subtitle: "Costas & Bíceps",
+    exercises: [
+      {id:"qu1", name:"Pulldown", series:4, reps:"12", work:"Costas"},
+      {id:"qu2", name:"Remada Baixa", series:3, reps:"15", work:"Costas"},
+      {id:"qu3", name:"Remada Curvada", series:3, reps:"12", work:"Costas"},
+      {id:"qu4", name:"Rosca direta Barra", series:3, reps:"15", work:"Bíceps"},
+      {id:"qu5", name:"Rosca Alternada", series:3, reps:"12", work:"Bíceps"},
+      {id:"qu6", name:"Rosca Martelo", series:3, reps:"12", work:"Bíceps"},
+    ]
+  },
+  "Sexta": {
+    subtitle: "Pernas (Posteriores, Glúteos & Panturrilha)",
+    exercises: [
+      {id:"se1", name:"Stiff", series:4, reps:"15", work:"Posterior"},
+      {id:"se2", name:"Cadeira Flexora", series:4, reps:"15", work:"Posterior"},
+      {id:"se3", name:"Elevação Pélvica", series:3, reps:"20", work:"Glúteo"},
+      {id:"se4", name:"Agachamento Sumo", series:3, reps:"12", work:"Glúteo"},
+      {id:"se5", name:"Gêmeos Sentado", series:4, reps:"10>20", work:"Panturrilha"},
+      {id:"se6", name:"Gêmeos Plantar", series:4, reps:"10>20", work:"Panturrilha"},
+    ]
+  }
+};
+
+/* Persistência local: chave */
+const STORAGE_KEY = "tamile_plano_checks_v1";
+
+/* Estado carregado da storage */
+let state = loadState();
+
+/* UI refs */
+const tabsEl = document.getElementById("tabs");
+const exList = document.getElementById("exList");
+const currentDayEl = document.getElementById("currentDay");
+const daySubtitleEl = document.getElementById("daySubtitle");
+const progressBar = document.getElementById("progressBar");
+const weekPct = document.getElementById("weekPct");
+const daysDone = document.getElementById("daysDone");
+
+/* init */
+let currentDay = "Segunda";
+renderDay(currentDay);
+attachTabHandlers();
+updateWeekSummary();
+
+/* Load saved state or initialize */
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) {
+      // init empty: map day->array of checked ids
+      const base = {};
+      for(const d of Object.keys(PLAN)) base[d] = [];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+      return base;
+    }
+    return JSON.parse(raw);
+  }catch(e){
+    console.error("loadState", e);
+    return {};
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateWeekSummary();
+}
+
+/* Render functions */
+function renderDay(day){
+  currentDay = day;
+  // update active tab
+  [...tabsEl.querySelectorAll(".tab")].forEach(t=>{
+    t.classList.toggle("active", t.dataset.day===day);
+  });
+
+  currentDayEl.textContent = day;
+  daySubtitleEl.textContent = PLAN[day].subtitle + " — " + state[day].length + "/" + PLAN[day].exercises.length;
+  // list exercises
+  exList.innerHTML = "";
+  PLAN[day].exercises.forEach(ex=>{
+    const checked = state[day].includes(ex.id);
+    const exEl = document.createElement("div");
+    exEl.className = "ex";
+    exEl.innerHTML = `
+      <div class="left">
+        <h3>${ex.name}</h3>
+        <div class="meta">${ex.series} series · ${ex.reps} repetições · ${ex.work}</div>
+      </div>
+      <button class="chk ${checked? "checked": ""}" data-id="${ex.id}" title="Marcar como realizado">
+        <input type="checkbox" ${checked? "checked": ""} />
+        <span>${checked ? "OK" : "Marcar"}</span>
+      </button>
+    `;
+    exList.appendChild(exEl);
+
+    // click handler
+    exEl.querySelector(".chk").addEventListener("click", (ev)=>{
+      toggleEx(day, ex.id);
+    });
+  });
+
+  updateProgressBar(day);
+}
+
+/* toggle */
+function toggleEx(day, exId){
+  const arr = state[day];
+  const idx = arr.indexOf(exId);
+  if(idx >= 0) arr.splice(idx,1);
+  else arr.push(exId);
+  state[day] = arr;
+  saveState();
+  renderDay(day);
+}
+
+/* update progress */
+function updateProgressBar(day){
+  const total = PLAN[day].exercises.length;
+  const done = state[day].length;
+  const pct = total === 0 ? 0 : Math.round(done / total * 100);
+  progressBar.style.width = pct + "%";
+  daySubtitleEl.textContent = PLAN[day].subtitle + " — " + done + "/" + total;
+  weekPct.textContent = pct + "% completo";
+}
+
+/* tabs */
+function attachTabHandlers(){
+  tabsEl.querySelectorAll(".tab").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      const day = btn.dataset.day;
+      renderDay(day);
+    });
+  });
+
+  document.getElementById("markAll").addEventListener("click", ()=>{
+    state[currentDay] = PLAN[currentDay].exercises.map(x=>x.id);
+    saveState(); renderDay(currentDay);
+  });
+  document.getElementById("clearDay").addEventListener("click", ()=>{
+    state[currentDay] = [];
+    saveState(); renderDay(currentDay);
+  });
+  document.getElementById("resetAll").addEventListener("click", ()=>{
+    if(!confirm("Resetar todo o progresso?")) return;
+    for(const d of Object.keys(PLAN)) state[d]=[];
+    saveState(); renderDay(currentDay);
+  });
+
+  document.getElementById("todayBtn").addEventListener("click", ()=>{
+    // leva ao dia da semana atual (mon-fri)
+    const today = new Date();
+    const dow = today.getDay(); // 0 Sun ... 1 Mon
+    const mapping = {1:"Segunda",2:"Terça",3:"Quarta",4:"Quinta",5:"Sexta"};
+    const mapped = mapping[dow] || "Segunda";
+    renderDay(mapped);
+  });
+
+  document.getElementById("exportCsv").addEventListener("click", exportCSV);
+  document.getElementById("downloadJson").addEventListener("click", downloadJson);
+  document.getElementById("importBtn").addEventListener("click", ()=>document.getElementById("importFile").click());
+  document.getElementById("importFile").addEventListener("change", importJsonFile);
+}
+
+/* weekly summary */
+function updateWeekSummary(){
+  const days = Object.keys(PLAN);
+  let daysCompleted = 0, totalPct=0;
+  days.forEach(d=>{
+    const total = PLAN[d].exercises.length;
+    const done = (state[d] || []).length;
+    if(done === total && total>0) daysCompleted++;
+    const pct = total ===0? 0 : (done/total)*100;
+    totalPct += pct;
+  });
+  const avg = Math.round(totalPct / days.length);
+  weekPct.textContent = avg + "% completo";
+  daysDone.textContent = `${daysCompleted}/${days.length}`;
+}
+
+/* export CSV of done items */
+function exportCSV(){
+  let rows = [["Dia","Exercício","Séries","Repetições","Trabalho","Concluído"]];
+  for(const day of Object.keys(PLAN)){
+    for(const ex of PLAN[day].exercises){
+      const done = state[day].includes(ex.id) ? "SIM" : "NÃO";
+      rows.push([day,ex.name,ex.series,ex.reps,ex.work,done]);
+    }
+  }
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "plano_tamile_checks.csv"; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* export JSON */
+function downloadJson(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "plano_tamile_checks.json"; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* import JSON */
+function importJsonFile(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      // basic validation: must contain keys for days
+      for(const day of Object.keys(PLAN)){
+        if(!Array.isArray(data[day])) data[day] = [];
+      }
+      state = data;
+      saveState(); renderDay(currentDay);
+      alert("Importação concluída.");
+    }catch(err){
+      alert("Arquivo inválido.");
+    }
+  };
+  reader.readAsText(file);
+  // reset input so same file can be reimported
+  ev.target.value = "";
+}
+
+/* initial render helpers */
+renderDay(currentDay);
+updateWeekSummary();
+
+</script>
+</body>
+</html>
